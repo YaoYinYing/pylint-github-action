@@ -10,6 +10,10 @@ inputs:
   python-version:
     description: "Python version which will install all dependencies and lint package(s)"
     required: true
+  conda-env-name:
+    description: "Conda environment name for the package."
+    required: false
+    default: ''
   requirements-path:
     description: "The path, relative to the root of the repo, of the requirements to install"
     default: requirements.txt
@@ -38,36 +42,70 @@ inputs:
     description: "Color of the badge for pylint scores == 10. Hex, rgb, rgba, hsl, hsla and css named colors can all be used"
     default: brightgreen
     required: false
+  badge-artifact-name:
+    description: "The name of the artifact name for the badge file to upload."
+    default: upload-my-awesome-badge
+  badge-file-name:
+    description: "The name of the badge file."
+    default: badge
+  
 
 runs:
   using: "composite"
 
   steps:
     -
-      name: "Checkout Repository - PR"
-      uses: actions/checkout@v3
-      if: github.event_name == 'pull_request'
+      name: Check branch id for analysis
+      id: branch-check
+      run: |
+        target_branch=${{ (github.event_name == 'pull_request') && github.event.pull_request.head.ref || github.ref }}
+        echo target_branch=$target_branch
+        echo target_branch=$target_branch >> $GITHUB_OUTPUT
+      shell: bash
+    -
+      name: "Checkout Repository"
+      uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.pull_request.head.ref }}
-    -
-      name: "Checkout Repository - PUSH"
-      uses: actions/checkout@v3
-      if: github.event_name != 'pull_request'
-    -
+        ref: ${{ steps.branch-check.outputs.target_branch }}
+    
+    # if conda env is not given, setup python from scratch
+    - 
+      if: ${{ inputs.conda-env-name == '' }}
       name: "Setup python"
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
+
+    # if conda env is given, check if it's exists
+    - 
+      name: "Check conda env"
+      if: ${{ ! inputs.conda-env-name == '' }}
+      run: |
+        if [[ $(conda info -e |grep ${{ inputs.conda-env-name }} |wc -l) -eq 1 ]];then 
+          echo "Conda environment ${{ inputs.conda-env-name }} is found."; 
+        else 
+          echo "Conda environment ${{ inputs.conda-env-name}} is not found."
+          exit 1; 
+        fi
+      shell: bash
+
     -
       name: "Setup installation requirements"
       run: |
+        if [[ ! -z ${{ inputs.conda-env-name }} ]];then source activate ${{ inputs.conda-env-name }};fi
         pip install --upgrade pip
         pip install wheel pylint
-        pip install -r ${{ inputs.requirements-path }}
+
+        if [[ ${{ inputs.requirements-path }} && -f ${{ inputs.requirements-path }} ]];then 
+          pip install -r ${{ inputs.requirements-path }};
+        elif [[ -f pyproject.toml || -f setup.py ]];then
+          pip install . ;
+        fi
       shell: bash
     -
       name: "Lint package(s)"
       run: |
+        if [[ ! -z ${{ inputs.conda-env-name }} ]];then source activate ${{ inputs.conda-env-name }};fi
         pkgs_pth=$(python3 -c 'import re; print(" ".join(re.findall("([^\s]+)", ${{ toJSON(inputs.lint-path) }})))')
         pylint --exit-zero --output-format=text:pylint_score.txt,colorized $pkgs_pth
       shell: bash
@@ -75,27 +113,50 @@ runs:
       name: "Get numeric pylint score and badge color"
       id: parameters-badge
       run: |
-        python ${{ github.action_path }}/get_score_color.py \
-        ${{ inputs.color-bad-score }} \
-        ${{ inputs.color-ok-score }} \
-        ${{ inputs.color-good-score }} \
-        ${{ inputs.color-perfect-score }}
+        pylint_score_w_delta=$(grep 'Your code has been rated at ' pylint_score.txt | cut -b 29- | sed 's/\/10//')
+        pylint_score=$(echo $pylint_score_w_delta |awk '{print $1}')
+        badge_color=$(echo $pylint_score | awk \
+            -v perf=${{ inputs.color-perfect-score }} \
+            -v good=${{ inputs.color-good-score }} \
+            -v ok=${{ inputs.color-ok-score }} \
+            -v bad=${{ inputs.color-bad-score }} \
+              '{
+                if($1==10){print perf} else {
+                  if($1>=8){print good} else {
+                    if($1>=5){print ok} else {
+                      print bad
+                    }
+                  }
+                }
+              }'
+        )
+          
+        echo badge_color=$badge_color >> $GITHUB_OUTPUT
+        echo pylint_score=$pylint_score >> $GITHUB_OUTPUT
+
+        echo badge_color=$badge_color
+        echo pylint_score=$pylint_score
       shell: bash
-    -
-      # $(echo ${{ inputs.badge-text }} | sed 's/ /%20/g') replaces spaces with %20
-      name: "Create badge and substitute it in README.md"
+
+    - 
+      name: Expected Badge path and fetch 
+      id: download-badge
       run: |
-        python ${{ github.action_path }}/create_subs_badge.py \
-        ${{ inputs.readme-path }} \
-        ${{ steps.parameters-badge.outputs.pylint_score }} \
-        $(echo ${{ inputs.badge-text }} | sed 's/ /%20/g') \
-        ${{ steps.parameters-badge.outputs.badge_color }}
+        svg_link="https://img.shields.io/badge/$(echo ${{ inputs.badge-text }} | sed 's/ /%20/g')-${{ steps.parameters-badge.outputs.pylint_score }}-${{ steps.parameters-badge.outputs.badge_color }}?logo=python&logoColor=white"
+        echo SVG link: $svg_link
+
+        badge_path="$(mktemp --suffix='oh-my-awesome-badge' -u)"
+        mkdir -p  $badge_path
+        echo "badge_path=$badge_path" >> $GITHUB_OUTPUT
+
+        curl -s -o $badge_path/${{ inputs.badge-file-name }}.svg $svg_link
+
       shell: bash
-    -
-      name: "Push README with changed badge to origin"
-      uses: EndBug/add-and-commit@v9
+    
+    - name: Upload to artifact
+      uses: actions/upload-artifact@v4
       with:
-        add: 'README.md'
-        default_author: github_actions
-        message: 'Updated pylint badge'
-        push: 'true'
+        name: ${{ inputs.badge-artifact-name }}
+        path: ${{ steps.download-badge.outputs.badge_path }}/${{ inputs.badge-file-name }}.svg
+        if-no-files-found: error
+        overwrite: true
