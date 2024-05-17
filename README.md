@@ -100,10 +100,6 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
     # The path, relative to the root of the repo, of the requirements to install. If no such file here, leave it as default.
     requirements-path: requirements.txt
 
-    # The path, relative to the root of the repo, of the README.md to update with the pylint badge
-    readme-path:
-    description: "README.md"
-
     # Text to display in the badge
     badge-text: PyLint
 
@@ -128,16 +124,20 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 
 ## Scenario
 
-* [Single package to lint](#single-package-to-lint)
-* [Single python file to lint](#single-python-file-to-lint)
-* [Multiple packages to lint](#multiple-packages-to-lint)
-* [Multiple python files to lint](#multiple-python-files-to-lint)
-* [Mix packages and python files to lint](#mix-packages-and-python-files-to-lint)
-* [Different path for requirements file](#different-path-for-requirements-file)
-* [Different path for README.md file](#different-path-for-readmemd-file)
-* [Change badge text](#change-badge-text)
-* [Change badge color with css named color](#change-badge-color-with-css-named-color)
-* [Change badge color with hex code](#change-badge-color-with-hex-code)
+- [PyLint with badge - GitHub Action](#pylint-with-badge---github-action)
+  - [Preliminary steps](#preliminary-steps)
+  - [Full Usage Explained](#full-usage-explained)
+  - [Scenario](#scenario)
+    - [Single package to lint](#single-package-to-lint)
+    - [Single python file to lint](#single-python-file-to-lint)
+    - [Multiple packages to lint](#multiple-packages-to-lint)
+    - [Multiple python files to lint](#multiple-python-files-to-lint)
+    - [Mix packages and python files to lint](#mix-packages-and-python-files-to-lint)
+    - [Different path for requirements file](#different-path-for-requirements-file)
+    - [Change badge text](#change-badge-text)
+    - [Change badge color with css named color](#change-badge-color-with-css-named-color)
+    - [Change badge color with hex code](#change-badge-color-with-hex-code)
+  - [Credits](#credits)
 
 ### Single package to lint
 
@@ -201,16 +201,6 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
     lint-path: src
     python-version: 3.11
     requirements-path: requirements/requirements-dev.txt
-```
-
-### Different path for README.md file
-
-```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
-  with:
-    lint-path: src
-    python-version: 3.11
-    readme-path: models/README.md
 ```
 
 ### Change badge text

@@ -18,10 +18,6 @@ inputs:
     description: "The path, relative to the root of the repo, of the requirements to install"
     default: requirements.txt
     required: false
-  readme-path:
-    description: "The path, relative to the root of the repo, of the README.md to update with the pylint badge"
-    default: README.md
-    required: false
   badge-text:
     description: "Text to display in the badge"
     default: PyLint
