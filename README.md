@@ -31,7 +31,7 @@ A quick example on how you would typically use this *action* (more examples in [
 ```yaml
 - name: PyLint Scanning
   id: pylint-scanning
-  uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+  uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src  # lint src package
     python-version: ${{ env.lint-python-version }}  # python version which will lint the package
@@ -86,7 +86,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ## Full Usage Explained
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@71719375c93948be6c99ea894bc75d585fca314c
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     # The path, relative to the root of the repo, of the package(s) or pyton file(s) to lint
     lint-path: src
@@ -142,7 +142,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Single package to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
@@ -151,7 +151,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Single python file to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: main.py
     python-version: 3.11
@@ -160,7 +160,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Multiple packages to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: |
       src
@@ -172,7 +172,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Multiple python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: |
       file1.py
@@ -184,7 +184,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Mix packages and python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: |
       src
@@ -196,7 +196,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Different path for requirements file
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
@@ -206,7 +206,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Different path for README.md file
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
@@ -216,7 +216,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Change badge text
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
@@ -229,7 +229,7 @@ In this case we are extending what we consider a perfect score: all scores in ra
 good enough and will have same color (*brightgreen*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
@@ -242,7 +242,7 @@ good enough and will have same color (*brightgreen*)
 In this example we are changing the color for the *bad score range* ($[0,5)$) to purple (hex code: *800080*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@b8fc3c1a373cb5fe949968c3126515e512ebe133
+- uses: YaoYinYing/pylint-github-action@v3.0
   with:
     lint-path: src
     python-version: 3.11
