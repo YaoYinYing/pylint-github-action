@@ -1,8 +1,8 @@
-name: "PyLint with dynamic badge"
-description: "Perform pylint check on one or multiple packages/python files and update badge in README.md"
+name: "Dynamic PyLint Badge connected with GitHub Artifact"
+description: "Perform pylint check on one or multiple packages/python files and update badge to GitHub artifact."
 branding:
-  icon: edit-3
-  color: yellow
+  icon: activity
+  color: green
 inputs:
   lint-path:
     description: "The path, relative to the root of the repo, of the package(s) or pyton file(s) to lint"
