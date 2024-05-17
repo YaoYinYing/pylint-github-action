@@ -137,6 +137,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
     - [Change badge text](#change-badge-text)
     - [Change badge color with css named color](#change-badge-color-with-css-named-color)
     - [Change badge color with hex code](#change-badge-color-with-hex-code)
+    - [Troubleshooting](#troubleshooting)
   - [Credits](#credits)
 
 ### Single package to lint
@@ -237,6 +238,20 @@ In this example we are changing the color for the *bad score range* ($[0,5)$) to
     lint-path: src
     python-version: 3.11
     color-bad-score: 800080
+```
+
+### Troubleshooting
+
+If you encounter issue like `fatal: detected dubious ownership in repository at '/__w/<repo-name>/<repo-name>'`, you should add a CI step in your main test workflow (`DevTests`, for the above example): 
+
+```yaml
+      - 
+        name: Set ownership
+        run: |
+          # this is to fix GIT not liking owner of the checkout dir
+          # https://github.com/actions/runner/issues/2033#issuecomment-1204205989
+          chown -R $(id -u):$(id -g) $PWD
+        shell: bash
 ```
 
 ## Credits
