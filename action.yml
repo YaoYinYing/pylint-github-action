@@ -88,12 +88,12 @@ runs:
     -
       name: "Setup installation requirements"
       run: |
-        if [[ ! -z ${{ inputs.conda-env-name }} ]];then source activate ${{ inputs.conda-env-name }};fi
+        if [[ -n "${{ inputs.conda-env-name }}" ]];then source activate "${{ inputs.conda-env-name }}";fi
         pip install --upgrade pip
         pip install wheel pylint
 
         if [[ ${{ inputs.requirements-path }} && -f ${{ inputs.requirements-path }} ]];then 
-          pip install -r ${{ inputs.requirements-path }};
+          pip install -r "${{ inputs.requirements-path }}";
         elif [[ -f pyproject.toml || -f setup.py ]];then
           pip install . ;
         fi
@@ -101,7 +101,7 @@ runs:
     -
       name: "Lint package(s)"
       run: |
-        if [[ ! -z ${{ inputs.conda-env-name }} ]];then source activate ${{ inputs.conda-env-name }};fi
+        if [[ -n "${{ inputs.conda-env-name }}" ]];then source activate "${{ inputs.conda-env-name }}";fi
         pkgs_pth=$(python3 -c 'import re; print(" ".join(re.findall("([^\s]+)", ${{ toJSON(inputs.lint-path) }})))')
         pylint --exit-zero --output-format=text:pylint_score.txt,colorized $pkgs_pth
       shell: bash
