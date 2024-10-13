@@ -10,6 +10,10 @@ inputs:
   python-version:
     description: "Python version which will install all dependencies and lint package(s)"
     required: true
+  pylint-args:
+    description: "Additional arguments to pass to pylint"
+    required: false
+    default: ''
   conda-env-name:
     description: "Conda environment name for the package."
     required: false
@@ -113,7 +117,7 @@ runs:
       run: |
         if [[ -n "${{ inputs.conda-env-name }}" ]];then source activate "${{ inputs.conda-env-name }}";fi
         pkgs_pth=$(python3 -c 'import re; print(" ".join(re.findall("([^\s]+)", ${{ toJSON(inputs.lint-path) }})))')
-        pylint --exit-zero --output-format=text:pylint_score.txt,colorized $pkgs_pth
+        pylint --exit-zero --output-format=text:pylint_score.txt,colorized ${{ inputs.pylint-args }} $pkgs_pth
       shell: bash
     -
       name: "Get numeric pylint score and badge color"
