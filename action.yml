@@ -44,6 +44,16 @@ inputs:
   badge-file-name:
     description: "The name of the badge file."
     default: badge
+
+  CLOUDFLARE_API_TOKEN:
+    description: "Cloudflare API token"
+    required: true
+  R2_BUCKET:
+    description: "R2 bucket name"
+    required: true
+  R2_badge_path:
+    description: "Path to the badge file in R2 bucket"
+    default: my-awesome-badges/example/
   
 
 runs:
@@ -156,3 +166,17 @@ runs:
         path: ${{ steps.download-badge.outputs.badge_path }}/${{ inputs.badge-file-name }}.svg
         if-no-files-found: error
         overwrite: true
+
+
+    - name: Upload to R2
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+        command: r2 object put  ${{ inputs.R2_BUCKET }}/${{ inputs.R2_badge_path }}/${{ inputs.badge-file-name }}.svg --file ${{ steps.download-badge.outputs.badge_path }}/${{ inputs.badge-file-name }}.svg --content-type image/svg+xml
+
+    - name: Echo as markdown
+      shell: bash
+      run: |
+        echo '--------------------- badge path --------------------
+        echo "[![${{ inputs.badge-text }}](https://<link-to-r2-bucket>/${{ inputs.R2_badge_path }}/${{ inputs.badge-file-name }}.svg)](https://github.com/YaoYinYing/pylint-github-action)"
+        echo '--------------------- badge path --------------------
