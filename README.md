@@ -15,29 +15,30 @@ following one of the below rules:
 | **Good score**: $8 \le$ *PyLint score* $< 10$ | ![PyLint-yellow](https://github.com/Silleellie/pylint-github-action/assets/26851363/6afe3441-193f-4cc7-8b64-a57110216c34) |
 |   **Perfect score**: *PyLint score* $= 10$    |   ![PyLint-10](https://github.com/Silleellie/pylint-github-action/assets/26851363/64fb3a03-c3b9-48ad-8f66-cea41a0ccaf8)   |
 
-
-**NEW:** You can now fully customize the badge color of each of the above ranges! Check [usage](#usage) 
+**NEW:** You can now fully customize the badge color of each of the above ranges! Check [usage](#usage)
 and [scenario](#scenario) sections for more!
 
+The action can be triggered by a **`Pull request`**, a **`Push`** or manually with **`workflow_dispatch`**.
 
-The action can be triggered by a **`Pull request`**, a **`Push`** or manually with **`workflow_dispatch`**. 
-
-* **IMPORTANT!** Follow the ['Preliminary steps' section](#preliminary-steps) in order to allow the bot to update your 
+* **IMPORTANT!** Follow the ['Preliminary steps' section](#preliminary-steps) in order to allow the bot to update your
 README.md with the pylint badge!
-
 
 A quick example on how you would typically use this *action* (more examples in [scenario section](#scenario))
 
 ```yaml
 - name: PyLint Scanning
   id: pylint-scanning
-  uses: YaoYinYing/pylint-github-action@v3.0
+  uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src  # lint src package
     python-version: ${{ env.lint-python-version }}  # python version which will lint the package
     badge-text: pylint score
     badge-file-name: pylint_scan
-    conda-env-name: my-package
+    badge-artifact-name: upload-my-awesome-badge-${{ github.run_id }}
+    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    R2_badge_path: badge_dir_with_uniq_name/my-awesome-project/pylint
+
           
 ```
 
@@ -48,45 +49,21 @@ And after running the action, the *GitHub action* will update your PyLint badge 
 To use this action you should perform two simple **first-time-only** operations:
 
 1. In order to have a dynamic updated badge, before using for the first time this action, you should have a third party storage access (R2, S3, etc.) with publicly readable bucket.
-2. Add a section to your GA yml to download updated badge from artifact and upload it to R2:
-```yaml
-- jobs:
-  DevTests: # # Previous run with linting
-    ...
+2. Add `CLOUDFLARE_API_TOKEN` and `R2_BUCKET` to your repo secrets.
+3. You should create a Cloudflare API token with read/write permission to this R2 bucket, aswell as the read-only access to detailed user info.
+4. After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCKET }}`. Also, you should notice a markdown formated badge path at the end of the output log of the action.
+5. Now you can paste the markdown record to your README.md for this pylint badge:
+
+  ```text
+  [![pylint score](https://<link-to-r2-bucket>/badge_dir_with_uniq_name/my-awesome-project/pylint/pylint_scan.svg)](https://github.com/YaoYinYing/pylint-github-action)
+  ```
   
-  UpdateLinting:
-    runs-on: 'ubuntu-latest'
-    needs: DevTests # Previous run with linting as trigger
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: PyLint Badge Fetching
-        id: pylint-badge-fetch
-        uses: actions/download-artifact@v4
-        with:
-          name: upload-my-awesome-badge
-          path: badge_dir_with_uniq_name
-      - name: Display structure of downloaded files
-        run: ls -R badge_dir_with_uniq_name
-      - name: Upload to R2
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: r2 object put  ${{ secrets.R2_BUCKET }}/badge_dir_with_uniq_name/my-code/pylint/pylint_scan.svg --file badge_dir_with_uniq_name/pylint_scan.svg --content-type image/svg+xml
-```
-After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCKET }}`. 
-
-3. Now you can add a markdown record to your README.md for this pylint badge: 
-```text
-[![pylint](https://R2-bucket-url/badge_dir_with_uniq_name/my-code/pylint/pylint_scan.svg)](https://github.com/YaoYinYing/pylint-github-action)
-```
-4. Done!
-
+6. Thats it!
 
 ## Full Usage Explained
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     # The path, relative to the root of the repo, of the package(s) or pyton file(s) to lint
     lint-path: src
@@ -120,6 +97,15 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 
     # The basename of badge file. 
     badge-file-name: badge
+
+    # CLOUDFLARE_API_TOKEN with r/w/detailed-user-info permission
+    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    # R2_BUCKET name that can be publicly accessed
+    R2_BUCKET: r2_bucket_id
+
+    # The path, relative to the root of the repo, of the badge file.
+    R2_badge_path: badge_dir_with_uniq_name/my-awesome-project/pylint
 ```
 
 ## Scenario
@@ -137,13 +123,12 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
     - [Change badge text](#change-badge-text)
     - [Change badge color with css named color](#change-badge-color-with-css-named-color)
     - [Change badge color with hex code](#change-badge-color-with-hex-code)
-    - [Troubleshooting](#troubleshooting)
   - [Credits](#credits)
 
 ### Single package to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src
     python-version: 3.11
@@ -152,7 +137,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Single python file to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: main.py
     python-version: 3.11
@@ -161,7 +146,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Multiple packages to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: |
       src
@@ -173,7 +158,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Multiple python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: |
       file1.py
@@ -185,7 +170,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Mix packages and python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: |
       src
@@ -197,7 +182,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Different path for requirements file
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src
     python-version: 3.11
@@ -207,7 +192,7 @@ After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCK
 ### Change badge text
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src
     python-version: 3.11
@@ -220,7 +205,7 @@ In this case we are extending what we consider a perfect score: all scores in ra
 good enough and will have same color (*brightgreen*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src
     python-version: 3.11
@@ -233,25 +218,11 @@ good enough and will have same color (*brightgreen*)
 In this example we are changing the color for the *bad score range* ($[0,5)$) to purple (hex code: *800080*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.0
+- uses: YaoYinYing/pylint-github-action@v3.4
   with:
     lint-path: src
     python-version: 3.11
     color-bad-score: 800080
-```
-
-### Troubleshooting
-
-If you encounter issue like `fatal: detected dubious ownership in repository at '/__w/<repo-name>/<repo-name>'`, you should add a CI step in your main test workflow (`DevTests`, for the above example): 
-
-```yaml
-      - 
-        name: Set ownership
-        run: |
-          # this is to fix GIT not liking owner of the checkout dir
-          # https://github.com/actions/runner/issues/2033#issuecomment-1204205989
-          chown -R $(id -u):$(id -g) $PWD
-        shell: bash
 ```
 
 ## Credits
@@ -264,6 +235,5 @@ This is a composite GitHub action which uses the following godly working actions
 * [actions/download-artifact](https://github.com/actions/download-artifact)
 * [actions/setup-python](https://github.com/actions/setup-python)
 * [cloudflare/wrangler-action](https://github.com/cloudflare/wrangler-action)
-
 
 Massive thanks to [shields.io](https://shields.io/), which is used to create the badge!
