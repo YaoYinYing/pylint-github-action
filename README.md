@@ -49,15 +49,15 @@ And after running the action, the *GitHub action* will update your PyLint badge 
 To use this action you should perform two simple **first-time-only** operations:
 
 1. In order to have a dynamic updated badge, before using for the first time this action, you should have a third party storage access (R2, S3, etc.) with publicly readable bucket.
-2. Add `CLOUDFLARE_API_TOKEN` and `R2_BUCKET` to your repo secrets.
-3. You should create a Cloudflare API token with read/write permission to this R2 bucket, aswell as the read-only access to detailed user info.
+2. You should create a Cloudflare API token with read/write permission to this R2 bucket, aswell as the read-only access to detailed user info.
+3. Add `CLOUDFLARE_API_TOKEN` and `R2_BUCKET` to your repo secrets.
 4. After lint running, a new badge will be upload to R2 bucket `${{ secrets.R2_BUCKET }}`. Also, you should notice a markdown formated badge path at the end of the output log of the action.
 5. Now you can paste the markdown record to your README.md for this pylint badge:
 
   ```text
   [![pylint score](https://<link-to-r2-bucket>/badge_dir_with_uniq_name/my-awesome-project/pylint/pylint_scan.svg)](https://github.com/YaoYinYing/pylint-github-action)
   ```
-  
+
 6. Thats it!
 
 ## Full Usage Explained
