@@ -28,7 +28,7 @@ A quick example on how you would typically use this *action* (more examples in [
 ```yaml
 - name: PyLint Scanning
   id: pylint-scanning
-  uses: YaoYinYing/pylint-github-action@v3.4
+  uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src  # lint src package
     python-version: ${{ env.lint-python-version }}  # python version which will lint the package
@@ -63,7 +63,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ## Full Usage Explained
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     # The path, relative to the root of the repo, of the package(s) or pyton file(s) to lint
     lint-path: src
@@ -128,7 +128,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Single package to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src
     python-version: 3.11
@@ -137,7 +137,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Single python file to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: main.py
     python-version: 3.11
@@ -146,7 +146,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Multiple packages to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: |
       src
@@ -158,7 +158,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Multiple python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: |
       file1.py
@@ -170,7 +170,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Mix packages and python files to lint
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: |
       src
@@ -182,7 +182,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Different path for requirements file
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src
     python-version: 3.11
@@ -192,7 +192,7 @@ To use this action you should perform two simple **first-time-only** operations:
 ### Change badge text
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src
     python-version: 3.11
@@ -205,7 +205,7 @@ In this case we are extending what we consider a perfect score: all scores in ra
 good enough and will have same color (*brightgreen*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src
     python-version: 3.11
@@ -218,7 +218,7 @@ good enough and will have same color (*brightgreen*)
 In this example we are changing the color for the *bad score range* ($[0,5)$) to purple (hex code: *800080*)
 
 ```yaml
-- uses: YaoYinYing/pylint-github-action@v3.4
+- uses: YaoYinYing/pylint-github-action@v3.5
   with:
     lint-path: src
     python-version: 3.11
